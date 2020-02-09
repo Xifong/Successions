@@ -2,8 +2,6 @@ package toys.xifongchristian;
 
 import org.apache.commons.math3.distribution.GammaDistribution;
 
-import java.util.HashMap;
-
 public abstract class Personage implements IPersonage {
     protected Attributes attributes;
     protected PersonageRegistry registry;
@@ -40,6 +38,7 @@ public abstract class Personage implements IPersonage {
 
     protected boolean die(){
         if(doesHappen(deathProb())){
+            System.out.println("###########I am dying.###########");
             registry.markDead(id);
             return true;
         }

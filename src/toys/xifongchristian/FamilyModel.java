@@ -31,7 +31,7 @@ public class FamilyModel implements Iterable{
         }
 
         private boolean hasSpouse(){
-            return spouse == null;
+            return !(spouse == null);
         }
     }
 
@@ -78,7 +78,7 @@ public class FamilyModel implements Iterable{
     }
 
     private Node getNodeAt(int id){
-        System.out.println("3");
+        System.out.println("Searching for node: " + id);
         if(id > lastId){
             throw new IndexOutOfBoundsException("This id has not been used yet: " + id);
         }

@@ -16,6 +16,7 @@ public class DefaultPersonage extends Personage {
         }
         System.out.println("A thread has finished marriage phase.");
         if(registry.isMarried(id)) {
+            System.out.println("I am married.");
             beget();
         }
         System.out.println("A thread has finished spawn phase.");
@@ -41,6 +42,7 @@ public class DefaultPersonage extends Personage {
 
     private void marry(){
         if(doesHappen(marriageProb())){
+            System.out.println("###########I am marrying.###########");
             registry.addSpouse(id);
         }
     }
@@ -52,6 +54,7 @@ public class DefaultPersonage extends Personage {
 
     private void beget(){
         if(doesHappen(begetProb())){
+            System.out.println("###########I am having a child.###########");
             registry.addChild(id);
         }
     }
