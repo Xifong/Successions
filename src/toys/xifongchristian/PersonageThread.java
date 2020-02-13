@@ -12,23 +12,22 @@ public class PersonageThread implements Runnable {
     }
 
     public void run(){
+        System.out.println("Deregestering person " + personage.getId() + "; Phaser waiting on: " + phaser.getUnarrivedParties());
         phaser.arriveAndAwaitAdvance();
         while(true){
             if(phaser.isTerminated()) {
-                System.out.println("A thread is about to terminate in accordance with phaser termination.");
                 break;
             }
-            System.out.println("A thread is to act.");
+            System.out.println("Person " + personage.getId() + " is to act.");
             boolean stillAlive = personage.enactBehaviour();
-            System.out.println("A thread has acted.");
+            System.out.println("Person " + personage.getId() + " has acted.");
             if (!stillAlive) {
+                System.out.println("Deregestering person " + personage.getId() + "; Phaser waiting on: " + phaser.getUnarrivedParties());
                 phaser.arriveAndDeregister();
-                System.out.println("A thread has deregistered and is about to terminate.");
                 break;
             }
-            System.out.println("A thread is to arrive.");
+            System.out.println("Deregestering person " + personage.getId() + "; Phaser waiting on: " + phaser.getUnarrivedParties());
             phaser.arriveAndAwaitAdvance();
         }
-        System.out.println("A thread has terminated");
     }
 }

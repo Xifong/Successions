@@ -1,21 +1,22 @@
 package toys.xifongchristian;
 
-import javax.management.BadAttributeValueExpException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PersonageRegistry {
 
     private PersonageThreadManager threadManager;
-    private FamilyModel model;
+    private IFamModel model;
     private List<Integer> toMarkDead;
 
-    PersonageRegistry(){
-        model = new FamilyModel();
-        Attributes attributes = new Attributes(0, 18, 100, 100, 100);
-        model.setRoot(
-                PersonageFactory.newPersonage(PersonageFactory.PersonEnum.DEFAULT, attributes, 0, this));
+    PersonageRegistry(IFamModel model){
+        this.model = model;
         toMarkDead = new ArrayList<>();
+        if(model.isFresh()) {
+            Attributes attributes = new Attributes(0, 18, 100, 100, 100);
+            model.addPersonageAt(-1,
+                    PersonageFactory.newPersonage(PersonageFactory.PersonEnum.DEFAULT, attributes, this));
+        }
     }
 
     public void setThreadManager(PersonageThreadManager threadManager){
@@ -26,18 +27,19 @@ public class PersonageRegistry {
     }
 
     private void addPersonageAt(int id, Attributes attributes, PersonageFactory.PersonEnum type){
-        int newId = model.addNodeAt(id);
-        IPersonage newPersonage = PersonageFactory.newPersonage(type, attributes, newId, this);
-        model.attachPersonage(newId, newPersonage);
+        IPersonage newPersonage = PersonageFactory.newPersonage(type, attributes, this);
+        model.addPersonageAt(id, newPersonage);
+        System.out.println("Child Node created at " + id + ".");
+        threadManager.addPersonage(newPersonage);
     }
 
-    public void addSpouse(int id){
+    public synchronized void addSpouse(int id){
         //Temporary - May want attribute factory
         Attributes attributes = new Attributes(1, 18, 100, 100, 100);
         addPersonageAt(id, attributes, PersonageFactory.PersonEnum.CONSORT);
     }
 
-    public void addChild(int id){
+    public synchronized void addChild(int id){
         //Temporary - May want attribute factory
         Attributes attributes = new Attributes(0, 0, 100, 100, 100);
         addPersonageAt(id, attributes, PersonageFactory.PersonEnum.DEFAULT);
@@ -48,16 +50,7 @@ public class PersonageRegistry {
     }
 
     public boolean isMarried(int id){
-        System.out.println("1");
         return model.hasSpouse(id);
-    }
-
-    public boolean changed(){
-        return false;
-    }
-
-    public int size(){
-        return 0;
     }
 
     private void transactDeaths(){

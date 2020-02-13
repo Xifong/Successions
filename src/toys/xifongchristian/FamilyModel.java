@@ -2,7 +2,7 @@ package toys.xifongchristian;
 
 import java.util.*;
 
-public class FamilyModel implements Iterable{
+public class FamilyModel implements IFamModel {
     //Assumes 1-1 asymmetric pairing. One way spouse relation.
     private int lastId = -1;
 
@@ -12,14 +12,14 @@ public class FamilyModel implements Iterable{
 
         private IPersonage satelliteData;
         private Node spouse;
-        private ArrayList<Node> children;
+        private ArrayList<Node> children = new ArrayList<>();
 
         Node(){
             id = ++lastId;
             live = true;
         }
 
-        private int addTo(){
+        private Node addTo(){
             Node newNode = new Node();
             if(!hasSpouse()){
                 spouse = newNode;
@@ -27,7 +27,7 @@ public class FamilyModel implements Iterable{
             else {
                 children.add(newNode);
             }
-            return newNode.id;
+            return newNode;
         }
 
         private boolean hasSpouse(){
@@ -37,18 +37,24 @@ public class FamilyModel implements Iterable{
 
     private Node root;
 
-    public void setRoot(IPersonage personage){
+    public boolean isFresh(){
+        return lastId == -1;
+    }
+
+    private void setRoot(IPersonage personage){
         lastId = -1;
         root = new Node();
         root.satelliteData = personage;
     }
 
-    public void attachPersonage(int id, IPersonage personage){
-        getNodeAt(id).satelliteData = personage;
+    private void attachPersonage(Node node, IPersonage personage){
+        node.satelliteData = personage;
+        personage.setId(node.id);
     }
 
-    public int addNodeAt(int parentId){
+    private Node addNodeAt(int parentId){
         Node parent = getNodeAt(parentId);
+        System.out.println("Parent found");
         return parent.addTo();
     }
 
@@ -60,8 +66,18 @@ public class FamilyModel implements Iterable{
         return children;
     }
 
+    public int addPersonageAt(int id, IPersonage personage){
+        if(id == -1){
+            setRoot(personage);
+            return 0;
+        } else {
+            Node newNode = addNodeAt(id);
+            attachPersonage(newNode, personage);
+            return newNode.id;
+        }
+    }
+
     public boolean hasSpouse(int id){
-        System.out.println("2");
         return getNodeAt(id).hasSpouse();
     }
 
@@ -85,13 +101,14 @@ public class FamilyModel implements Iterable{
         Node current = root;
         ArrayList<Node> fringe = new ArrayList<>();
         while(true){
+            //System.out.println(fringe);
             if(current.id == id){
                 return current;
             }
-            if(current.spouse.id == id){
+            if(current.hasSpouse() && current.spouse.id == id){
                 return current.spouse;
             }
-            fringe.addAll(root.children);
+            fringe.addAll(current.children);
             current = fringe.get(0);
             fringe.remove(0);
         }

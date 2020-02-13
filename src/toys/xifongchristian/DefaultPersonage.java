@@ -2,26 +2,22 @@ package toys.xifongchristian;
 
 public class DefaultPersonage extends Personage {
 
-    DefaultPersonage(Attributes attributes, PersonageRegistry registry, int id){
-        super(attributes, registry, id);
+    DefaultPersonage(Attributes attributes, PersonageRegistry registry){
+        super(attributes, registry);
     }
 
     @Override
     public boolean enactBehaviour(){
         //marriage_status should not be an attribute - should get it from the registry.
-        System.out.println("0");
         if(!registry.isMarried(id)) {
-            System.out.println("A thread will marry.");
+            System.out.println("Person " + getId() + " will try for marriage.");
             marry();
         }
-        System.out.println("A thread has finished marriage phase.");
         if(registry.isMarried(id)) {
-            System.out.println("I am married.");
+            System.out.println("Person " + getId() + " will try for a child.");
             beget();
         }
-        System.out.println("A thread has finished spawn phase.");
         age();
-        System.out.println("A thread has aged and is to enter death phase.");
         return !die();
     }
 
@@ -37,24 +33,29 @@ public class DefaultPersonage extends Personage {
 
         double baseUtil =  (wealthUtil + charmUtil + looksUtil)/3;
 
-        return baseUtil * ageDistributionUtil.density(age) * 10;
+        System.out.println("Person " + getId() + " has marriage potential: " + baseUtil);
+
+        return 0.5;
+        //return baseUtil * ageDistributionUtil.density(age) * 10;
     }
 
     private void marry(){
-        if(doesHappen(marriageProb())){
-            System.out.println("###########I am marrying.###########");
+        double prob = marriageProb();
+        System.out.println("Person " + getId() + " has marriage probability: " + prob);
+        if(doesHappen(prob)){
+            System.out.println("###########Person " + getId() + " is marrying.###########");
             registry.addSpouse(id);
         }
     }
 
     private double begetProb(){
         //temporary
-        return 0.15;
+        return 0.25;
     }
 
     private void beget(){
         if(doesHappen(begetProb())){
-            System.out.println("###########I am having a child.###########");
+            System.out.println("###########Person " + getId() + " is having a child.###########");
             registry.addChild(id);
         }
     }
