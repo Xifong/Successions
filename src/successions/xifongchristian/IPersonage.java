@@ -1,4 +1,4 @@
-package toys.xifongchristian;
+package successions.xifongchristian;
 
 public interface IPersonage {
     boolean enactBehaviour();

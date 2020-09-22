@@ -1,4 +1,4 @@
-package toys.xifongchristian;
+package successions.xifongchristian;
 
 public class Options {
     //Definitely do this properly for more info to bundle.

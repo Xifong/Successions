@@ -1,4 +1,4 @@
-package toys.xifongchristian;
+package successions.xifongchristian;
 
 import javax.swing.*;
 

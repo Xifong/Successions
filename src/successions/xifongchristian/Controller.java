@@ -1,4 +1,4 @@
-package toys.xifongchristian;
+package successions.xifongchristian;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,7 +21,8 @@ public class Controller extends JFrame implements ActionListener {
     private int cycles = 10;
     private int rootCharm = 100; //Actually make use of this - how does the Controller interatc with the model?
 
-    private SimInstance simulationManager;
+    private SimInstance simInstance;
+    private Thread simThread;
     private IModel model;
     private FamilyTreeDisplay display;
 
@@ -75,20 +76,20 @@ public class Controller extends JFrame implements ActionListener {
     }
 
     private void stopSim(){
-        int yearOffset = simulationManager.interruptSim();
-        model.setYearOffset(yearOffset);
+        simThread.interrupt();
+        model.setYearOffset(simInstance.getCurrentYear() + model.getYearOffset());
     }
 
-    //When thread terminates by its self, setGameBeing Played(false)
-    //Also, UI thread is being starved
+    //When thread terminates by its self, need to automatically stop/reset by feeding this back to the controller.
     public void setGameBeingPlayed(boolean isBeingPlayed) {
         if (isBeingPlayed) {
             mi_game_play.setEnabled(false);
             mi_game_stop.setEnabled(true);
-            simulationManager = new SimStarter(bundleOptions(), model).getSimInstance(this);
+            simInstance = new SimStarter(bundleOptions(), model).getSimInstance(this);
             isRunning = true;
             hasRun = true;
-            simulationManager.begin();
+            simThread = new Thread(simInstance);
+            simThread.start();
         } else {
             mi_game_play.setEnabled(true);
             mi_game_stop.setEnabled(false);
@@ -164,7 +165,7 @@ public class Controller extends JFrame implements ActionListener {
 
 
     private class FamilyTreeDisplay extends JPanel implements MouseListener {
-        private int offset = 10;
+        private int tempOffset = 10;
         private JLabel yearDisplay;
         FamilyTreeDisplay(){
             //Add a side panel for sim info
@@ -174,10 +175,15 @@ public class Controller extends JFrame implements ActionListener {
 
         private void setYearLabel(){
             if(hasRun) {
-                int year = simulationManager.getCurrentYear();
+                int year = simInstance.getCurrentYear();
                 if (year != -1) {
                     //Rn this is doubling the year - oops, need to check running status
-                    yearDisplay.setText("Year: " + (simulationManager.getCurrentYear() + model.getYearOffset()));
+                    if(isRunning) {
+                        yearDisplay.setText("Year: " + (simInstance.getCurrentYear() + model.getYearOffset()));
+                    }
+                    else{
+                        yearDisplay.setText("Year: " + model.getYearOffset());
+                    }
                     return;
                 }
             }
@@ -188,8 +194,8 @@ public class Controller extends JFrame implements ActionListener {
         public void paintComponent(Graphics g) {
             //Only called in response to events - cannot have animations encoded here
             super.paintComponent(g);
-            offset = (offset - 10)%500;
-            g.draw3DRect(100 - offset, 100, 10, 10, true);
+            tempOffset = (tempOffset - 10)%500;
+            g.draw3DRect(100 - tempOffset, 100, 10, 10, true);
             setYearLabel();
         }
 

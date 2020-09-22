@@ -1,4 +1,4 @@
-package toys.xifongchristian;
+package successions.xifongchristian;
 
 public class DefaultModel implements IModel{
     private IFamModel familyModel;

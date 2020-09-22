@@ -1,4 +1,4 @@
-package toys.xifongchristian;
+package successions.xifongchristian;
 
 public class PersonageFactory{
     public static IPersonage newPersonage(PersonEnum type, Attributes attributes, PersonageRegistry registry){
